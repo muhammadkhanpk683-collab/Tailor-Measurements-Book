@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tailor Customer Management & Measurement Book</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --bg-color: #f4f7f6;
+            --border-color: #bdc3c7;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 10px;
+            color: #333;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        .search-box-container {
+            margin-bottom: 15px;
+            position: relative;
+            background: #eef2f3;
+            padding: 12px;
+            border-radius: 6px;
+        }
+        .search-box-container label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        .search-row-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .search-input {
+            flex: 1;
+            min-width: 180px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+        .btn-search {
+            background-color: #2980b9;
+            color: white;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: auto;
+        }
+        .btn-search:hover { background-color: #1f618d; }
+        
+        .btn-delete-all {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: auto;
+        }
+        .btn-delete-all:hover { background-color: #c0392b; }
+
+        .suggestions-list {
+            position: absolute;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: calc(100% - 24px);
+            max-height: 180px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .suggestions-list li {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+        .suggestions-list li:hover {
+            background-color: #f1f2f6;
+        }
+        .sheet-border {
+            border: 2px solid var(--primary-color);
+            padding: 12px;
+            border-radius: 6px;
+            background: #fff;
+        }
+        .top-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+        .form-group label {
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: var(--primary-color);
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            width: 100%;
+        }
+        .main-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .sketch-box {
+            border: 2px solid var(--primary-color);
+            padding: 12px;
+            text-align: center;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+        .sketch-box h4 {
+            margin: 0 0 8px 0;
+            color: var(--accent-color);
+            font-size: 1rem;
+        }
+        .measurements-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .measure-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 6px;
+        }
+        .measure-row label {
+            font-weight: bold;
+            font-size: 13px;
+            flex: 1;
+        }
+        .measure-row input {
+            width: 110px;
+            padding: 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .bottom-grid .form-group input {
+            text-align: center;
+        }
+        .btn-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        button {
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-save {
+            background-color: #27ae60;
+            color: white;
+        }
+        .btn-save:hover { background-color: #219653; }
+        .btn-print {
+            background-color: #2980b9;
+            color: white;
+        }
+        .btn-print:hover { background-color: #1f618d; }
+        .btn-clear {
+            background-color: #7f8c8d;
+            color: white;
+        }
+        .btn-clear:hover { background-color: #626567; }
+        .btn-delete {
+            background-color: var(--accent-color);
+            color: white;
+            display: none;
+        }
+        .btn-delete:hover { background-color: #c0392b; }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        @media (min-width: 600px) {
+            body { padding: 20px; }
+            .top-row { flex-direction: row; }
+            .bottom-grid { grid-template-columns: repeat(4, 1fr); }
+            .btn-container { flex-direction: row; justify-content: flex-end; }
+            button { width: auto; padding: 10px 20px; }
+        }
+        @media (min-width: 768px) {
+            .main-section { flex-direction: row; align-items: flex-start; }
+            .sketch-box { flex: 1; }
+            .measurements-list { flex: 1; }
+        }
+        @media print {
+            body { background: #fff; padding: 0; }
+            .search-box-container, .btn-container, footer { display: none; }
+            .container { box-shadow: none; padding: 0; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>✂️ Tailor Measurement Book</h2>
+
+    <!-- Search & Master Controls Section -->
+    <div class="search-box-container">
+        <label for="searchCustomer">Search Customer Name:</label>
+        <div class="search-row-group">
+            <input type="text" id="searchCustomer" class="search-input" placeholder="Type name to search..." autocomplete="off">
+            <button type="button" class="btn-search" onclick="triggerSearch()">Search</button>
+            <button type="button" class="btn-delete-all" onclick="deleteAllData()">Delete All Data</button>
+        </div>
+        <ul id="suggestions" class="suggestions-list"></ul>
+    </div>
+
+    <!-- Ledger Measurement Sheet -->
+    <div class="sheet-border">
+        <form id="tailorForm">
+            <input type="hidden" id="recordId">
+            <div class="top-row">
+                <div class="form-group" style="max-width: none;">
+                    <label>Serial No (سیریل نمبر)</label>
+                    <input type="text" id="serialNo" inputmode="decimal" required placeholder="Auto-generated">
+                </div>
+                <div class="form-group" style="max-width: none;">
+                    <label>Date (تاریخ)</label>
+                    <input type="date" id="orderDate">
+                </div>
+                <div class="form-group" style="flex: 2;">
+                    <label>Customer Name (نام)</label>
+                    <input type="text" id="customerName" required placeholder="Enter customer name">
+                </div>
+            </div>
+
+            <div class="main-section">
+                <!-- Left Side: Garment Sketch/Details Note Box -->
+                <div class="sketch-box">
+                    <h4>Addl Details / Style (اضافی تفصیل)</h4>
+                    <div style="font-size: 12px; color: #666; margin-bottom: 8px;">[ Design & Style Notes ]</div>
+                    <textarea id="extraDetails" rows="6" placeholder="Collar/ban style, cuffs, pockets, fit notes..."></textarea>
+                </div>
+
+                <!-- Right Side: Standard Measurements -->
+                <div class="measurements-list">
+                    <div class="measure-row">
+                        <label>Shirt Length (قمیض لمبائی):</label>
+                        <input type="text" id="shirtLength" inputmode="decimal" placeholder="0">
+                    </div>
+                    <div class="measure-row">
+                        <label>Sleeve (بازو):</label>
+                        <input type="text" id="sleeve" inputmode="decimal" placeholder="0">
+                    </div>
+                    <div class="measure-row">
+                        <label>Shoulder (تیرا):</label>
+                        <input type="text" id="shoulder" inputmode="decimal" placeholder="0">
+                    </div>
+                    <div class="measure-row">
+                        <label>Neck / Collar (گلا):</label>
+                        <input type="text" id="collar" inputmode="decimal" placeholder="0">
+                    </div>
+                    <div class="measure-row">
+                        <label>Chest (چھاتی):</label>
+                        <input type="text" id="chest" inputmode="decimal" placeholder="0">
+                    </div>
+                    <div class="measure-row">
+                        <label>Waist (کمر):</label>
+                        <input type="text" id="waist" inputmode="decimal" placeholder="0">
+                    </div>
+                    <div class="measure-row">
+                        <label>Ghera / Damen (گھیرا):</label>
+                        <input type="text" id="ghera" inputmode="decimal" placeholder="0">
+                    </div>
+                    <div class="measure-row">
+                        <label>Shalwar Length (شلوار):</label>
+                        <input type="text" id="shalwarLength" inputmode="decimal" placeholder="0">
+                    </div>
+                    <div class="measure-row">
+                        <label>Paincha (پائنچہ):</label>
+                        <input type="text" id="paincha" inputmode="decimal" placeholder="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Small Grid Boxes (All 4 Set to Decimal/Digit Entry) -->
+            <div class="bottom-grid">
+                <div class="form-group">
+                    <label>Front (فرنٹ)</label>
+                    <input type="text" id="frontStyle" inputmode="decimal" placeholder="">
+                </div>
+                <div class="form-group">
+                    <label>Collar/Ban (کالر بین)</label>
+                    <input type="text" id="collarBanStyle" inputmode="decimal" placeholder="">
+                </div>
+                <div class="form-group">
+                    <label>Cuff (کف)</label>
+                    <input type="text" id="cuffStyle" inputmode="decimal" placeholder="">
+                </div>
+                <div class="form-group">
+                    <label>Side (سائیڈ)</label>
+                    <input type="text" id="sideStyle" inputmode="decimal" value="">
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="btn-container">
+                <button type="button" class="btn-clear" onclick="resetForm()">Clear</button>
+                <button type="button" class="btn-delete" id="btnDeleteRecord" onclick="deleteCurrentRecord()">Delete Customer</button>
+                <button type="button" class="btn-print" onclick="window.print()">Print Slip</button>
+                <button type="submit" class="btn-save">Save Record</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        Design by Sajjad Ali Humdard
+    </footer>
+</div>
+
+<script>
+    document.getElementById('orderDate').valueAsDate = new Date();
+
+    function getStoredCustomers() {
+        let data = localStorage.getItem('tailor_customers');
+        return data ? JSON.parse(data) : [];
+    }
+
+    function saveStoredCustomers(customers) {
+        try {
+            localStorage.setItem('tailor_customers', JSON.stringify(customers));
+        } catch (e) {
+            alert('Storage limit reached!');
+        }
+    }
+
+    function getNextSerialNo() {
+        const customers = getStoredCustomers();
+        if (customers.length === 0) return 1;
+        
+        let maxNum = 0;
+        customers.forEach(c => {
+            let num = parseInt(c.serialNo);
+            if (!isNaN(num) && num > maxNum) {
+                maxNum = num;
+            }
+        });
+        return maxNum > 0 ? maxNum + 1 : customers.length + 1;
+    }
+
+    function initSerialNo() {
+        if (!document.getElementById('recordId').value) {
+            document.getElementById('serialNo').value = getNextSerialNo();
+        }
+    }
+
+    document.getElementById('tailorForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const recordId = document.getElementById('recordId').value;
+        const serialNoInput = document.getElementById('serialNo').value.trim();
+        const customers = getStoredCustomers();
+
+        const duplicateSerial = customers.find(c => c.serialNo === serialNoInput && c.id != recordId);
+        if (duplicateSerial) {
+            alert(`Error: Serial Number "${serialNoInput}" already exists for customer "${duplicateSerial.customerName}". Please use a unique serial number.`);
+            return;
+        }
+
+        const customerData = {
+            id: recordId ? parseInt(recordId) : Date.now(),
+            serialNo: serialNoInput,
+            orderDate: document.getElementById('orderDate').value,
+            customerName: document.getElementById('customerName').value.trim(),
+            shirtLength: document.getElementById('shirtLength').value,
+            sleeve: document.getElementById('sleeve').value,
+            shoulder: document.getElementById('shoulder').value,
+            collar: document.getElementById('collar').value,
+            chest: document.getElementById('chest').value,
+            waist: document.getElementById('waist').value,
+            ghera: document.getElementById('ghera').value,
+            shalwarLength: document.getElementById('shalwarLength').value,
+            paincha: document.getElementById('paincha').value,
+            extraDetails: document.getElementById('extraDetails').value,
+            frontStyle: document.getElementById('frontStyle').value,
+            collarBanStyle: document.getElementById('collarBanStyle').value,
+            cuffStyle: document.getElementById('cuffStyle').value,
+            sideStyle: document.getElementById('sideStyle').value
+        };
+
+        if(!customerData.customerName) {
+            alert('Please enter a customer name!');
+            return;
+        }
+
+        if (recordId) {
+            const index = customers.findIndex(c => c.id == recordId);
+            if (index !== -1) customers[index] = customerData;
+        } else {
+            customers.unshift(customerData);
+        }
+
+        saveStoredCustomers(customers);
+        alert('Customer record successfully saved!');
+        resetForm();
+    });
+
+    function editCustomer(id) {
+        const customers = getStoredCustomers();
+        const cust = customers.find(c => c.id == id);
+        if(!cust) return;
+
+        document.getElementById('recordId').value = cust.id;
+        document.getElementById('serialNo').value = cust.serialNo || '';
+        document.getElementById('orderDate').value = cust.orderDate || '';
+        document.getElementById('customerName').value = cust.customerName || '';
+        document.getElementById('shirtLength').value = cust.shirtLength || '';
+        document.getElementById('sleeve').value = cust.sleeve || '';
+        document.getElementById('shoulder').value = cust.shoulder || '';
+        document.getElementById('collar').value = cust.collar || '';
+        document.getElementById('chest').value = cust.chest || '';
+        document.getElementById('waist').value = cust.waist || '';
+        document.getElementById('ghera').value = cust.ghera || '';
+        document.getElementById('shalwarLength').value = cust.shalwarLength || '';
+        document.getElementById('paincha').value = cust.paincha || '';
+        document.getElementById('extraDetails').value = cust.extraDetails || '';
+        document.getElementById('frontStyle').value = cust.frontStyle || '';
+        document.getElementById('collarBanStyle').value = cust.collarBanStyle || '';
+        document.getElementById('cuffStyle').value = cust.cuffStyle || '';
+        document.getElementById('sideStyle').value = cust.sideStyle || '';
+        
+        document.getElementById('btnDeleteRecord').style.display = 'block';
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function deleteCurrentRecord() {
+        const recordId = document.getElementById('recordId').value;
+        if (!recordId) return;
+
+        if (confirm('Are you sure you want to permanently delete this customer record?')) {
+            let customers = getStoredCustomers();
+            customers = customers.filter(c => c.id != recordId);
+            saveStoredCustomers(customers);
+            alert('Customer record deleted successfully.');
+            resetForm();
+        }
+    }
+
+    function deleteAllData() {
+        const customers = getStoredCustomers();
+        if (customers.length === 0) {
+            alert('No saved data found.');
+            return;
+        }
+
+        if (confirm('WARNING: Are you sure you want to permanently delete ALL saved customer data? This cannot be undone!')) {
+            localStorage.removeItem('tailor_customers');
+            alert('All saved customer data has been deleted.');
+            resetForm();
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('tailorForm').reset();
+        document.getElementById('recordId').value = '';
+        document.getElementById('orderDate').valueAsDate = new Date();
+        document.getElementById('btnDeleteRecord').style.display = 'none';
+        document.getElementById('searchCustomer').value = '';
+        initSerialNo();
+    }
+
+    const searchInput = document.getElementById('searchCustomer');
+    const suggestionsList = document.getElementById('suggestions');
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        suggestionsList.innerHTML = '';
+
+        if (query.length < 1) return;
+
+        const customers = getStoredCustomers();
+        const matches = customers.filter(c => c.customerName.toLowerCase().includes(query)).slice(0, 10);
+
+        matches.forEach(match => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${match.customerName}</strong> (Serial: ${match.serialNo || 'N/A'}, Chest: ${match.chest || '-'})`;
+            li.onclick = function() {
+                editCustomer(match.id);
+                searchInput.value = match.customerName;
+                suggestionsList.innerHTML = '';
+            };
+            suggestionsList.appendChild(li);
+        });
+    });
+
+    function triggerSearch() {
+        const query = searchInput.value.toLowerCase().trim();
+        suggestionsList.innerHTML = '';
+
+        if (!query) {
+            alert('Please enter a customer name to search.');
+            return;
+        }
+
+        const customers = getStoredCustomers();
+        const found = customers.find(c => c.customerName.toLowerCase().includes(query));
+
+        if (found) {
+            editCustomer(found.id);
+        } else {
+            alert('No customer found matching that name!');
+        }
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-box-container')) {
+            suggestionsList.innerHTML = '';
+        }
+    });
+
+    // Initialize the serial number on first load
+    initSerialNo();
+</script>
+
+</body>
+<style>html{
+ color:darkviolet;
+ font-size:25px;
+ font-weight:600;
+}
+</style><script>/*Here write your javascript code*/</script></html>
